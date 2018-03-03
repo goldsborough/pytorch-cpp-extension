@@ -20,8 +20,7 @@ std::vector<at::Tensor> lltm_cuda_backward(
     at::Tensor candidate_cell,
     at::Tensor X,
     at::Tensor gate_weights,
-    at::Tensor weights,
-    at::Tensor old_cell);
+    at::Tensor weights);
 
 // C++ interface
 
@@ -51,8 +50,7 @@ std::vector<at::Tensor> lltm_backward(
     at::Tensor candidate_cell,
     at::Tensor X,
     at::Tensor gate_weights,
-    at::Tensor weights,
-    at::Tensor old_cell) {
+    at::Tensor weights) {
   CHECK_CUDA(grad_h);
   CHECK_CUDA(grad_cell);
   CHECK_CUDA(input_gate);
@@ -61,7 +59,6 @@ std::vector<at::Tensor> lltm_backward(
   CHECK_CUDA(X);
   CHECK_CUDA(gate_weights);
   CHECK_CUDA(weights);
-  CHECK_CUDA(old_cell);
   return lltm_cuda_backward(
       grad_h,
       grad_cell,
@@ -71,8 +68,7 @@ std::vector<at::Tensor> lltm_backward(
       candidate_cell,
       X,
       gate_weights,
-      weights,
-      old_cell);
+      weights);
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {

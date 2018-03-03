@@ -76,9 +76,12 @@ std::vector<at::Tensor> lltm_backward(
   auto d_weights = d_gates.t().mm(X);
   auto d_bias = d_gates.sum(/*dim=*/0, /*keepdim=*/true);
 
-  auto d_X = d_gates.mm(weights).split(new_cell.size(1), /*dim=*/1);
+  auto d_X = d_gates.mm(weights);
+  const auto state_size = grad_h.size(1);
+  auto d_old_h = d_X.slice(/*dim=*/1, 0, state_size);
+  auto d_input = d_X.slice(/*dim=*/1, state_size);
 
-  return {d_X[0], d_X[1], d_weights, d_bias, d_old_cell};
+  return {d_old_h, d_input, d_weights, d_bias, d_old_cell};
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {

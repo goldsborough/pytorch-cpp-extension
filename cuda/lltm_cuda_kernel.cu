@@ -140,13 +140,12 @@ std::vector<at::Tensor> lltm_cuda_backward(
     at::Tensor candidate_cell,
     at::Tensor X,
     at::Tensor gate_weights,
-    at::Tensor weights,
-    at::Tensor old_cell) {
-  auto d_old_cell = at::zeros_like(old_cell);
+    at::Tensor weights) {
+  auto d_old_cell = at::zeros_like(new_cell);
   auto d_gates = at::zeros_like(gate_weights);
 
-  const auto batch_size = old_cell.size(0);
-  const auto state_size = old_cell.size(1);
+  const auto batch_size = new_cell.size(0);
+  const auto state_size = new_cell.size(1);
 
   const int threads = 1024;
   const dim3 blocks(batch_size, (state_size + threads - 1) / threads);
@@ -167,7 +166,10 @@ std::vector<at::Tensor> lltm_cuda_backward(
 
   auto d_weights = d_gates.t().mm(X);
   auto d_bias = d_gates.sum(/*dim=*/0, /*keepdim=*/true);
-  auto d_X = d_gates.mm(weights).split(state_size, /*dim=*/1);
 
-  return {d_X[0], d_X[1], d_weights, d_bias, d_old_cell};
+  auto d_X = d_gates.mm(weights);
+  auto d_old_h = d_X.slice(/*dim=*/1, 0, state_size);
+  auto d_input = d_X.slice(/*dim=*/1, state_size);
+
+  return {d_old_h, d_input, d_weights, d_bias, d_old_cell};
 }

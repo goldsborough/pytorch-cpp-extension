@@ -13,7 +13,7 @@ class LLTMFunction(Function):
     def forward(ctx, input, weights, bias, old_h, old_cell):
         outputs = lltm_cuda.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
-        variables = outputs[1:] + [weights, old_cell]
+        variables = outputs[1:] + [weights]
         ctx.save_for_backward(*variables)
 
         return new_h, new_cell
