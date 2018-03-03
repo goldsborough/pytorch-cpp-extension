@@ -20,7 +20,7 @@ parser.add_argument('-c', '--cuda', action='store_true')
 options = parser.parse_args()
 
 if options.example == 'py':
-    from lltm import LLTM
+    from python.lltm import LLTM
 elif options.example == 'cpp':
     from cpp.lltm import LLTM
 else:
