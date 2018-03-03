@@ -3,7 +3,7 @@ from torch import nn
 from torch.autograd import Function
 import torch
 
-import lltm
+import lltm_cpp
 
 torch.manual_seed(42)
 
@@ -11,7 +11,7 @@ torch.manual_seed(42)
 class LLTMFunction(Function):
     @staticmethod
     def forward(ctx, input, weights, bias, old_h, old_cell):
-        outputs = lltm.forward(input, weights, bias, old_h, old_cell)
+        outputs = lltm_cpp.forward(input, weights, bias, old_h, old_cell)
         new_h, new_cell = outputs[:2]
         variables = outputs[1:] + [weights, old_cell]
         ctx.save_for_backward(*variables)
@@ -20,7 +20,7 @@ class LLTMFunction(Function):
 
     @staticmethod
     def backward(ctx, grad_h, grad_cell):
-        d_old_h, d_input, d_weights, d_bias, d_old_cell = lltm.backward(
+        d_old_h, d_input, d_weights, d_bias, d_old_cell = lltm_cpp.backward(
             grad_h, grad_cell, *ctx.saved_variables)
         return d_input, d_weights, d_bias, d_old_h, d_old_cell
 
