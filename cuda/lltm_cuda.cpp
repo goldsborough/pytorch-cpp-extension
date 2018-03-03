@@ -59,6 +59,7 @@ std::vector<at::Tensor> lltm_backward(
   CHECK_CUDA(X);
   CHECK_CUDA(gate_weights);
   CHECK_CUDA(weights);
+
   return lltm_cuda_backward(
       grad_h,
       grad_cell,
